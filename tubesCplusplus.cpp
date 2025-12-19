@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cctype>
-using namespace std;
+using namespace std;//tes
 
 static const int ALPHABET_SIZE = 37; 
 // 0-25  : A-Z
@@ -254,4 +254,5 @@ int main() {
             cout << "Pilihan tidak valid!\n";
         }
     }
+
 } 
