@@ -8,9 +8,6 @@ static const int ALPHABET_SIZE = 37;
 // 26-35 : 0-9
 // 36    : spasi
 
-// ----------------------------------------------------------
-// TRIE NODE
-// ----------------------------------------------------------
 struct TrieNode {
     TrieNode* children[ALPHABET_SIZE];
     bool isEndOfWord;
@@ -24,9 +21,25 @@ struct TrieNode {
     }
 };
 
-// ----------------------------------------------------------
-// CHAR <-> INDEX MAPPING
-// ----------------------------------------------------------
+struct BSTNode {
+    string nama;
+    float emisi;
+    BSTNode *left, *right;
+
+    BSTNode(string n, float e) {
+        nama = n;
+        emisi = e;
+        left = right = nullptr;
+    }
+};
+
+string toUpperCase(string s) {
+    for (int i = 0; i < s.length(); i++) {
+        s[i] = toupper(s[i]);
+    }
+    return s;
+}
+
 int charToIndex(char ch) {
     if (isalpha(ch))
         return toupper(ch) - 'A';       // A-Z -> 0-25
@@ -44,16 +57,12 @@ char indexToChar(int idx) {
     return ' ';
 }
 
-// ----------------------------------------------------------
-// INSERT
-// ----------------------------------------------------------
-void insert(TrieNode* root, const string& word, float emisi) {
+void insertTrie(TrieNode* root,string word, float emisi) {
     TrieNode* curr = root;
-
-    for (char ch : word) {
+    for (int x = 0 ; x < word.length() ; x++) {
+        char ch = word[x];
         int index = charToIndex(ch); //perubahan
         if (index == -1) continue;
-
         if (curr->children[index] == nullptr)
             curr->children[index] = new TrieNode();
 
@@ -64,13 +73,30 @@ void insert(TrieNode* root, const string& word, float emisi) {
     curr->emisi = emisi;
 }
 
-// ----------------------------------------------------------
-// SEARCH
-// ----------------------------------------------------------
-TrieNode* search(TrieNode* root, const string& word) {
+BSTNode* insertBST(BSTNode* root, string nama, float emisi) {
+    if (root == nullptr) 
+    return new BSTNode(nama, emisi);
+
+    if (emisi < root->emisi)
+        root->left = insertBST(root->left, nama, emisi);
+    else
+        root->right = insertBST(root->right, nama, emisi);
+
+    return root;
+}
+
+// Fungsi tambahan untuk memastikan data masuk ke kedua struktur data
+BSTNode* tambahData(TrieNode* rootTrie, BSTNode* rootBST, string nama, float emisi) {
+    insertTrie(rootTrie, nama, emisi);
+    rootBST = insertBST(rootBST, nama, emisi);
+    return rootBST;
+}
+
+TrieNode* search(TrieNode* root, string word) {
     TrieNode* curr = root;
 
-    for (char ch : word) {
+    for (int x = 0 ; x < word.length() ; x++) {
+        char ch = word[x];
         int index = charToIndex(ch); //perubahan
         if (index == -1) continue;
 
@@ -86,10 +112,7 @@ return nullptr;
 
 }
 
-// ----------------------------------------------------------
-// DFS
-// ----------------------------------------------------------
-void dfs(TrieNode* node, const string& prefix) {
+void dfs(TrieNode* node,string prefix) {
     if (node->isEndOfWord) {
         cout << prefix << " - " << node->emisi << " kg CO2e\n";
     }
@@ -101,54 +124,43 @@ void dfs(TrieNode* node, const string& prefix) {
     }
 }
 
-// ----------------------------------------------------------
-// DISPLAY ALL
-// ----------------------------------------------------------
 void displayAll(TrieNode* root) {
     dfs(root, "");
 }
 
-// ----------------------------------------------------------
-// STARTSWITH
-// ----------------------------------------------------------
-void startsWith(TrieNode* root, const string& prefix) {
+void startsWith(TrieNode* root,string prefix) {
     TrieNode* curr = root;
-
-    for (char ch : prefix) {
+    string prefixKapital = toUpperCase(prefix);
+    for (int x = 0 ; x < prefix.length() ; x++) {
+        char ch = prefix[x];
         int index = charToIndex(ch);
-        if (index == -1) continue;
-
-        if (curr->children[index] == nullptr) {
-            cout << "Tidak ada lokasi dengan awalan '" << prefix << "'\n";
+        if (index == -1 || curr->children[index] == nullptr) {
+            cout << "Data tidak ditemukan." << endl;
             return;
         }
         curr = curr->children[index];
     }
-
-    dfs(curr, prefix);
+    dfs(curr, prefixKapital);
 }
 
-// ----------------------------------------------------------
-// SUM EMISI DFS
-// ----------------------------------------------------------
 float sumDFS(TrieNode* node) {
     float total = 0;
 
-    if (node->isEndOfWord)
+    if (node->isEndOfWord) 
         total += node->emisi;
 
     for (int i = 0; i < ALPHABET_SIZE; i++) {
         if (node->children[i] != nullptr)
             total += sumDFS(node->children[i]);
     }
-
     return total;
 }
 
-void sumEmisi(TrieNode* root, const string& prefix) {
+void sumEmisi(TrieNode* root,string prefix) {
     TrieNode* curr = root;
 
-    for (char ch : prefix) {
+    for (int x = 0 ; x < prefix.length() ; x++) {
+        char ch = prefix[x];
         int index = charToIndex(ch);
         if (index == -1) continue;
 
@@ -164,31 +176,53 @@ void sumEmisi(TrieNode* root, const string& prefix) {
          << "' = " << total << " kg CO2e\n";
 }
 
-// ----------------------------------------------------------
-// MAIN
-// ----------------------------------------------------------
+void cetakTerendah(BSTNode* root, int &count, int limit) {
+    if (root == nullptr || count >= limit)
+        return;
+
+    cetakTerendah(root->left, count, limit);
+    if (count < limit) {
+        count++;
+        cout << count << ". " << root->nama << " (" << root->emisi << " kg CO2e)" << endl;
+    }
+    cetakTerendah(root->right, count, limit);
+}
+
+void cetakTertinggi(BSTNode* root, int &count, int limit) {
+    if (root == nullptr || count >= limit)
+        return;
+
+    cetakTertinggi(root->right, count, limit);
+    if (count < limit) {
+        count++;
+        cout << count << ". " << root->nama << " (" << root->emisi << " kg CO2e)" << endl;
+    }
+    cetakTertinggi(root->left, count, limit);
+}
+
 int main() {
     TrieNode* root = new TrieNode();
-
-    // DATA AWAL
-    insert(root, "Laboratorium Kimia", 50);
-    insert(root, "Laboratorium Fisika", 40);
-    insert(root, "Laboratorium Bio", 30);
-    insert(root, "Kantin Utama", 20);
-    insert(root, "Kantin Teknik", 15);
-    insert(root, "Gedung A", 25);
-    insert(root, "Gedung B", 35);
-    insert(root, "Gedung Kuliah Umum", 60);
-    insert(root, "Perpustakaan", 10);
-    insert(root, "Pusat Riset Energi", 70);
-
-    // TEST ANGKA + SPASI
-    insert(root, "Ruangan 2702", 12.5);
-    insert(root, "Ruangan 2703", 13.0);
+    BSTNode* rootBST = nullptr;
 
     int pilihan;
     string nama;
     float emisi;
+
+    rootBST = tambahData(root, rootBST, "Laboratorium Kimia", 50);
+    rootBST = tambahData(root, rootBST, "Laboratorium Fisika", 40);
+    rootBST = tambahData(root, rootBST, "Laboratorium Bio", 30);
+    rootBST = tambahData(root, rootBST, "Kantin Utama", 20);
+    rootBST = tambahData(root, rootBST, "Kantin Teknik", 15);
+    rootBST = tambahData(root, rootBST, "Gedung A", 25);
+    rootBST = tambahData(root, rootBST, "Gedung B", 35);
+    rootBST = tambahData(root, rootBST, "Gedung Kuliah Umum", 60);
+    rootBST = tambahData(root, rootBST, "Perpustakaan", 10);
+    rootBST = tambahData(root, rootBST, "Pusat Riset Energi", 70);
+    rootBST = tambahData(root, rootBST, "Ruangan 2702", 12.5);
+    rootBST = tambahData(root, rootBST, "Ruangan 2703", 13.0);
+
+    
+
 
     while (true) {
         cout << "\n===== DATABASE EMISI LOKASI (TRIE) =====\n";
@@ -197,7 +231,9 @@ int main() {
         cout << "3. Cari lokasi berdasarkan prefix\n";
         cout << "4. Hitung total emisi berdasarkan prefix\n";
         cout << "5. Tampilkan semua lokasi\n";
-        cout << "6. Keluar\n";
+        cout << "6. Tampilkan emisi terendah\n";
+        cout << "7. Tampilkan emisi tertinggi\n";
+        cout << "8. Keluar\n";
         cout << "Pilih menu: ";
         cin >> pilihan;
         cin.ignore();
@@ -211,7 +247,7 @@ int main() {
             cin >> emisi;
             cin.ignore();
 
-            insert(root, nama, emisi);
+            tambahData(root, rootBST, nama, emisi);
             cout << "Berhasil ditambahkan!\n";
             break;
 
@@ -245,14 +281,34 @@ int main() {
             cout << "Semua Lokasi:\n";
             displayAll(root);
             break;
-
-        case 6:
+        case 6: { 
+            int n, counter = 0;
+            cout << "Masukkan jumlah data terendah yang ingin ditampilkan: ";
+            cin >> n;
+            cout << "\n--- " << n << " LOKASI DENGAN EMISI TERENDAH ---\n";
+            cetakTerendah(rootBST, counter, n);
+            if (counter == 0) 
+                cout << "Database kosong.\n";
+            break;
+        }
+        case 7: { 
+            int n, counter = 0;
+            cout << "Masukkan jumlah data tertinggi yang ingin ditampilkan: ";
+            cin >> n;
+            cout << "\n--- " << n << " LOKASI DENGAN EMISI TERTINGGI ---\n";
+            cetakTertinggi(rootBST, counter, n);
+            if (counter == 0) 
+                cout << "Database kosong.\n";
+            break;
+        }
+        case 8: {
             cout << "Program selesai.\n";
             return 0;
-
+        }
         default:
             cout << "Pilihan tidak valid!\n";
         }
     }
 
 } 
+
