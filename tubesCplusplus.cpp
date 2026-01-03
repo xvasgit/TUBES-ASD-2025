@@ -2,7 +2,7 @@
 #include <string>
 #include <cctype>
 using namespace std;//tes
-
+//Cek bisa atau engga
 static const int ALPHABET_SIZE = 37; 
 // 0-25  : A-Z
 // 26-35 : 0-9
@@ -311,4 +311,5 @@ int main() {
     }
 
 } 
+
 
