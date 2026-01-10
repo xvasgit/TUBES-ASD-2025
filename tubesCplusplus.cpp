@@ -279,7 +279,7 @@ int main() {
 
         case 5:
             cout << "Semua Lokasi:\n";
-            displayAll(root);
+             dfs(root, "");
             break;
         case 6: { 
             int n, counter = 0;
@@ -311,5 +311,6 @@ int main() {
     }
 
 } 
+
 
 
