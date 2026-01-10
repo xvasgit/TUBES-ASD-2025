@@ -124,10 +124,6 @@ void dfs(TrieNode* node,string prefix) {
     }
 }
 
-void displayAll(TrieNode* root) {
-    dfs(root, "");
-}
-
 void startsWith(TrieNode* root,string prefix) {
     TrieNode* curr = root;
     string prefixKapital = toUpperCase(prefix);
@@ -311,6 +307,7 @@ int main() {
     }
 
 } 
+
 
 
 
