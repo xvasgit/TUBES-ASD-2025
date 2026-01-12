@@ -1,12 +1,9 @@
-#include <iostream>                 // Library untuk input-output (cin, cout)
-#include <string>                   // Library untuk tipe data string
-#include <cctype>                   // Library untuk fungsi karakter (toupper, isalpha, isdigit)
+#include <iostream>                 
+#include <string>                   
+#include <cctype>                   
 using namespace std;               
 
 static const int ALPHABET_SIZE = 37; // Ukuran array children Trie (A-Z, 0-9, spasi)
-// 0-25  : A-Z                     // Mapping huruf kapital
-// 26-35 : 0-9                     // Mapping angka
-// 36    : spasi                   // Mapping karakter spasi
 
 struct TrieNode {                  // Struktur node Trie
     TrieNode* children[ALPHABET_SIZE]; // Array pointer ke anak Trie
@@ -85,8 +82,7 @@ BSTNode* insertBST(BSTNode* root, string nama, float emisi) { // Insert ke BST
     return root;                   // Kembalikan root
 }
 
-// Fungsi tambahan untuk memastikan data masuk ke kedua struktur data
-BSTNode* tambahData(TrieNode* rootTrie, BSTNode* rootBST, string nama, float emisi) {
+BSTNode* tambahData(TrieNode* rootTrie, BSTNode* rootBST, string nama, float emisi) { // Tambah data untuk memastikan data masuk ke kedua struktur data
     insertTrie(rootTrie, nama, emisi); // Tambah ke Trie
     rootBST = insertBST(rootBST, nama, emisi); // Tambah ke BST
     return rootBST;                // Kembalikan root BST
@@ -195,7 +191,7 @@ void cetakTertinggi(BSTNode* root, int &count, int limit) { // Cetak emisi terti
     cetakTertinggi(root->left, count, limit); // Traversal kiri
 }
 
-int main() {                 // Fungsi utama
+int main() {                 
     TrieNode* root = new TrieNode(); // Root Trie
     BSTNode* rootBST = nullptr;      // Root BST
 
@@ -217,7 +213,7 @@ int main() {                 // Fungsi utama
     rootBST = tambahData(root, rootBST, "Ruangan 2702", 12.5);
     rootBST = tambahData(root, rootBST, "Ruangan 2703", 13.0);
 
-    while (true) {            // Loop menu utama
+    while (true) {            
         cout << "\n===== DATABASE EMISI LOKASI (TRIE) =====\n";
         cout << "1. Tambah lokasi baru\n";
         cout << "2. Cari lokasi tertentu\n";
@@ -228,19 +224,19 @@ int main() {                 // Fungsi utama
         cout << "7. Tampilkan emisi tertinggi\n";
         cout << "8. Keluar\n";
         cout << "Pilih menu: ";
-        cin >> pilihan;       // Input pilihan menu
-        cin.ignore();         // Bersihkan buffer
+        cin >> pilihan;       
+        cin.ignore();         
 
-        switch (pilihan) {    // Percabangan menu
+        switch (pilihan) {    
         case 1:
             cout << "Nama lokasi: ";
-            getline(cin, nama); // Input nama
+            getline(cin, nama); 
 
             cout << "Emisi (kg CO2e): ";
-            cin >> emisi;     // Input emisi
-            cin.ignore();     // Bersihkan buffer
+            cin >> emisi;     
+            cin.ignore();     
 
-            tambahData(root, rootBST, nama, emisi); // Tambah data
+            tambahData(root, rootBST, nama, emisi); 
             cout << "Berhasil ditambahkan!\n";
             break;
 
@@ -248,31 +244,30 @@ int main() {                 // Fungsi utama
             cout << "Masukkan nama lokasi: ";
             getline(cin, nama); // Input nama
 
-            TrieNode* res = search(root, nama); // Cari di Trie
+            TrieNode* res = search(root, nama); 
 
             if (!res)
                 cout << "Lokasi tidak ditemukan!\n";
             else
-                cout << "Emisi " << nama << " = "
-                     << res->emisi << " kg CO2e\n";
+                cout << "Emisi " << nama << " = " << res->emisi << " kg CO2e\n";
             break;
         }
 
         case 3:
             cout << "Masukkan prefix: ";
             getline(cin, nama);
-            startsWith(root, nama); // Tampilkan berdasarkan prefix
+            startsWith(root, nama); 
             break;
 
         case 4:
             cout << "Masukkan prefix: ";
             getline(cin, nama);
-            sumEmisi(root, nama); // Hitung total emisi
+            sumEmisi(root, nama); 
             break;
 
         case 5:
             cout << "Semua Lokasi:\n";
-            dfs(root, "");     // Tampilkan semua data
+            dfs(root, "");     
             break;
 
         case 6: { 
@@ -299,11 +294,11 @@ int main() {                 // Fungsi utama
 
         case 8: {
             cout << "Program selesai.\n";
-            return 0;         // Keluar program
+            return 0;         
         }
 
         default:
-            cout << "Pilihan tidak valid!\n"; // Jika input salah
+            cout << "Pilihan tidak valid!\n"; 
         }
     }
 }
